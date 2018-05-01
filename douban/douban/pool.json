@@ -1,0 +1,4 @@
+[
+{"proxy_address": "221.5.54.6", "proxy_port": "808", "proxy_type": "HTTPS"},
+{"proxy_address": "113.87.193.171", "proxy_port": "61234", "proxy_type": "HTTPS"},
+{"proxy_address": "182.99.234.215", "proxy_port": "61234", "proxy_type": "HTTPS"}]

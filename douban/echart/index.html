@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <style>
+    body {
+      padding: 30px;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="main1" style="width: 100vw; height: 100vh"></div>
+  <div id="main2" style="width: 100vw; height: 100vh"></div>
+  <div id="main3" style="width: 100vw; height: 100vh"></div>
+  <div id="main4" style="width: 100vw; height: 100vh"></div>
+</body>
+
+<script src="echarts.js"></script>
+<script src="macarons.js"></script>
+<script>
+  function Ajax(loaction, callback, reverse) {
+    var data = null;
+    var xml = new XMLHttpRequest();
+    xml.open('GET', loaction);
+    xml.onreadystatechange = function() {
+      if (xml.readyState === 4) {
+        if (xml.status >= 200 && xml.status < 300  || xml.status === 304) {
+          var col = JSON.parse(xml.responseText);
+          if (reverse) {
+            callback(Object.keys(col).sort(function(a, b) {
+              return col[b] - col[a];
+            }), col);
+          } else {
+            callback(Object.keys(col), col)
+          }
+        }
+      }
+    }
+    xml.send();
+  }
+
+  var country,director,type,year;
+  var myChart1 = echarts.init(document.getElementById('main1'), 'macarons');
+  var myChart2 = echarts.init(document.getElementById('main2'), 'macarons');
+  var myChart3 = echarts.init(document.getElementById('main3'), 'macarons');
+  var myChart4 = echarts.init(document.getElementById('main4'), 'macarons');
+  
+  Ajax('./country.json', function(text, data) {
+    myChart1.setOption({
+      title: {
+        text: '国家分布'
+      },
+      tooltip: {},
+      legent: {
+        data: ['数量']
+      },
+      series: [{
+        type: 'pie',
+        radius: '55%',
+        data: text.map(function(item) {
+          return {
+            value: data[item],
+            name: item
+          }
+        })
+      }]
+    });
+  }, true);
+
+
+  Ajax('./director.json', function(text, data) {
+    var datapro = [];
+    var textpro = [];
+    for (var item of text) {
+      if (data[item] >= 3) {
+        datapro.push(data[item]);
+        textpro.push(item)
+      }
+    }
+
+    myChart2.setOption({
+      title: {
+        text: '导演执导影片数量',
+        subtext: '执导数大于等于3部'
+      },
+      tooltip: {},
+      legend: {
+        data: ['数量']
+      },
+      xAxis: {
+        data: textpro
+      },
+      yAxis: {},
+      series: [{
+        name: '数量',
+        type: 'bar',
+        data: datapro
+      }]
+    });
+  }, true);
+
+  Ajax('./type.json', function(text, data) {
+    myChart3.setOption({
+      title: {
+        text: '影片种类'
+      },
+      roseType: 'angle',
+      tooltip: {},
+      legent: {
+        data: ['数量']
+      },
+      series: [{
+        type: 'pie',
+        radius: '80%',
+        data: text.map(function(item) {
+          return {
+            value: data[item],
+            name: item
+          }
+        })
+      }]
+    });
+  }, true);
+
+  Ajax('./year.json', function(text, data) {
+
+    myChart4.setOption({
+      title: {
+        text: '上映年份'
+      },
+      tooltip: {
+        trigger: 'axis',
+      },
+      xAxis: {
+        data: text
+      },
+      yAxis: {
+      },
+      series: [{
+        name: '数量',
+        type: 'line',
+        data: text.map(function(item) {
+          return {
+            value: data[item],
+            name: item
+          }
+        })
+      }]
+    })
+}, false);
+</script>
+</html>
